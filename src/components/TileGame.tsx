@@ -27,15 +27,40 @@ const letterFrequencies: Record<string, number> = {
   X: 0.15,
   Y: 1.97,
   Z: 0.07,
-  "*": 10,
+  "*": 5,
 };
 
 const letterPool: string[] = Object.entries(letterFrequencies).flatMap(
-  ([letter, freq]) => Array(Math.round(freq * 15)).fill(letter)
+  ([letter, freq]) => Array(Math.round(freq * 10)).fill(letter)
 );
 
 const getRandomLetter = (): string =>
   letterPool[Math.floor(Math.random() * letterPool.length)];
+
+const themes = [
+  "love",
+  "beauty",
+  "nature",
+  "sacrifice",
+  "a distant memory",
+  "facing fear",
+  "a moment of joy",
+  "lost and found",
+  "sounds of the night",
+  "a dream you had",
+  "a secret door",
+  "time",
+  "a fleeting moment",
+  "the meaning of home",
+  "a missed opportunity",
+  "winter’s first snow",
+  "a stormy night",
+  "changing leaves",
+  "new beginnings",
+  "forgotten objects",
+  "talking to a cat",
+  "nostalgia",
+];
 
 interface Tile {
   letter: string;
@@ -48,6 +73,7 @@ export default function TileGame() {
   const [playerNames, setPlayerNames] = useState<string[]>(() =>
     JSON.parse(localStorage.getItem("playerNames") || "[]")
   );
+  const [theme, setTheme] = useState<string>("");
 
   useEffect(() => {
     localStorage.setItem("playerNames", JSON.stringify(playerNames));
@@ -66,6 +92,7 @@ export default function TileGame() {
     setPlayerNames(
       Array.from({ length: players }, (_, i) => playerNames[i] || "")
     );
+    setTheme(themes[Math.floor(Math.random() * themes.length)]);
   };
 
   const toggleTile = (playerIdx: number, tileIdx: number): void => {
@@ -100,7 +127,7 @@ export default function TileGame() {
 
   return (
     <div className="p-4 text-center">
-      <h1 className="text-2xl font-bold mb-4">Tile Simulator</h1>
+      <h1 className="text-2xl font-bold mb-4">Tile Game</h1>
       <input
         type="number"
         min="1"
@@ -111,10 +138,21 @@ export default function TileGame() {
       />
       <button
         onClick={startGame}
-        className="ml-2 bg-blue-500 text-white px-4 py-2 rounded cursor-pointer"
+        className="ml-2 bg-blue-500 text-white px-4 py-2 rounded"
       >
         Start
       </button>
+      {theme && (
+        <div
+          className="mt-4 p-4 bg-yellow-100 border border-yellow-500 rounded-md shadow-md text-lg italic"
+          style={{
+            background:
+              "url('https://www.transparenttextures.com/patterns/aged-paper.png')",
+          }}
+        >
+          Theme: {theme}
+        </div>
+      )}
       <div className="mt-4 space-y-4">
         {rows.map((row, playerIdx) => (
           <div key={playerIdx} className="flex flex-col items-center gap-2">
@@ -135,7 +173,7 @@ export default function TileGame() {
                 >
                   {tile.letter}
                   <button
-                    className={`absolute cursor-pointer top-0 right-0 text-white text-xs rounded-full w-5 h-5 ${
+                    className={`absolute top-0 right-0 text-white text-xs rounded-full w-5 h-5 ${
                       tile.removed ? "bg-green-500" : "bg-red-500"
                     }`}
                     onClick={() => toggleTile(playerIdx, tileIdx)}
@@ -151,7 +189,7 @@ export default function TileGame() {
       {rows.length > 0 && (
         <button
           onClick={regenerateTiles}
-          className="mt-4 bg-green-500 text-white px-4 py-2 rounded cursor-pointer"
+          className="mt-4 bg-green-500 text-white px-4 py-2 rounded"
         >
           Regenerate Tiles
         </button>
